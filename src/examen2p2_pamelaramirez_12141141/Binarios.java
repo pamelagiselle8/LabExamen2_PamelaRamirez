@@ -49,7 +49,7 @@ public class Binarios {
                 ObjectInputStream objeto = new ObjectInputStream(entrada);
                 try {
                     while ((cientifico = (Cientifico) objeto.readObject()) != null) {
-                        Cientifico.add(cientifico);
+                        cientificos.add(cientifico);
                     }
                 } catch (EOFException e) {
                     
