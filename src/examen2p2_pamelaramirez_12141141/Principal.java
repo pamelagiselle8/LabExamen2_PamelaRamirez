@@ -12,10 +12,12 @@ import javax.swing.tree.DefaultTreeModel;
 
 public class Principal extends javax.swing.JFrame implements Runnable {
 
+    Random r = new Random();
     Binarios file = new Binarios("./Cientificos.cbm");
     ArrayList<Planeta> publicos = new ArrayList();
     Planeta p1, p2;
     int d, peso, tam, x, y;
+    double energia, tiempo, velocidad, energiaMax;
     Thread hilo = new Thread(this);
 
     public Principal() {
@@ -40,11 +42,13 @@ public class Principal extends javax.swing.JFrame implements Runnable {
 
     @Override
     public void run() {
+        tiempo = 0.0;
         pb1.setMaximum((int) d);
-        boolean sigue = true;
+        boolean sigue = true, bonus = false;
         while (sigue) {
             try {
                 pb1.setValue(pb1.getValue() + 1);
+                tiempo += 5.0;
                 Thread.sleep(5);
                 if (pb1.getValue() == pb1.getMaximum()) {
                     sigue = false;
@@ -53,7 +57,6 @@ public class Principal extends javax.swing.JFrame implements Runnable {
                 System.out.println(ex);
             }
         }
-        d = 0;
         if (p1.seCrea()) {
             String nom = JOptionPane.showInputDialog(this, "Se ha creado un nuevo planeta!"
                     + "\nIngrese el nombre: ");
@@ -63,7 +66,31 @@ public class Principal extends javax.swing.JFrame implements Runnable {
             } else {
                 cientifico.getPlanetas().add(new Gaseoso(tam, peso, nom, x, y));
             }
+            file.cargarArchivo();
             actualizarTree(cientifico.getPlanetas());
+        }
+        bonus = true;
+        System.out.println(d);
+        System.out.println(tiempo);
+        velocidad = d / tiempo;
+        energia = (1 / 2) * (p1.getPeso() + p2.getPeso()) * Math.pow(velocidad, 2);
+        energiaMax = energia + r.nextInt((int)(energia * 2));
+        pb2.setMaximum((int) +(energiaMax));
+        System.out.println("Tiempo: " + tiempo);
+        System.out.println("Distancia: " + d);
+        System.out.println("Velocidad: " + velocidad);
+        System.out.println("Energia: " + energia);
+        System.out.println("Energia maxima: " + energiaMax);
+        while (bonus) {
+            try {
+                pb2.setValue(pb2.getValue() + 1);
+                Thread.sleep(5);
+                if (pb2.getValue() >= energia) {
+                    bonus = false;
+                }
+            } catch (Exception ex) {
+                System.out.println(ex);
+            }
         }
     }
 
