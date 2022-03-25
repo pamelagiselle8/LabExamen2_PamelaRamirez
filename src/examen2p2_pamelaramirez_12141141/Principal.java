@@ -66,27 +66,40 @@ public class Principal extends javax.swing.JFrame implements Runnable {
             } else {
                 cientifico.getPlanetas().add(new Gaseoso(tam, peso, nom, x, y));
             }
+            file.escribirArchivo();
             file.cargarArchivo();
             actualizarTree(cientifico.getPlanetas());
         }
-        bonus = true;
-        System.out.println(d);
-        System.out.println(tiempo);
         velocidad = d / tiempo;
-        energia = (1 / 2) * (p1.getPeso() + p2.getPeso()) * Math.pow(velocidad, 2);
-        energiaMax = energia + r.nextInt((int)(energia * 2));
-        pb2.setMaximum((int) +(energiaMax));
+        energia = (0.5) * (p1.getPeso() + p2.getPeso()) * Math.pow(velocidad, 2);
+        energiaMax = (int)energia + r.nextInt((int)(energia * 2));
         System.out.println("Tiempo: " + tiempo);
         System.out.println("Distancia: " + d);
         System.out.println("Velocidad: " + velocidad);
         System.out.println("Energia: " + energia);
-        System.out.println("Energia maxima: " + energiaMax);
+        System.out.println("Energia maxima: " + energiaMax + "\n");
+        pb2.setMaximum((int)(energiaMax));
+        bonus = true;
         while (bonus) {
             try {
                 pb2.setValue(pb2.getValue() + 1);
                 Thread.sleep(5);
                 if (pb2.getValue() >= energia) {
                     bonus = false;
+                }
+                if (pb2.getValue() <= (energiaMax * 50)/100) {
+                    pb2.setForeground(Color.green);
+                }
+                else if (pb2.getValue() > (energiaMax * 50)/100
+                        && pb2.getValue() <= (energiaMax * 75)/100) {
+                    pb2.setForeground(Color.yellow);
+                }
+                else if (pb2.getValue() > (energiaMax * 75)/100
+                        && pb2.getValue() <= (energiaMax * 90)/100) {
+                    pb2.setForeground(Color.red);
+                }
+                else {
+                    pb2.setForeground(Color.black);
                 }
             } catch (Exception ex) {
                 System.out.println(ex);
@@ -316,6 +329,7 @@ public class Principal extends javax.swing.JFrame implements Runnable {
     private void cboCientificosItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboCientificosItemStateChanged
         actualizarTree(new ArrayList());
         if (cboCientificos.getSelectedIndex() >= 0) {
+            cbPublicos.setSelected(false);
             Cientifico cientifico = (Cientifico) cboCientificos.getSelectedItem();
             if (!cientifico.getPlanetas().isEmpty()) {
                 actualizarTree(cientifico.getPlanetas());
@@ -337,7 +351,9 @@ public class Principal extends javax.swing.JFrame implements Runnable {
                 }
                 if (d > 0) {
                     pb1.setValue(0);
+                    pb2.setValue(0);
                     new Thread(this).start();
+                    file.escribirArchivo();
                 }
             } else {
                 JOptionPane.showMessageDialog(this, "Debe seleccionar un cientifico.", "", 2);
