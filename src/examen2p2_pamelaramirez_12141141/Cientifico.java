@@ -1,10 +1,11 @@
 
 package examen2p2_pamelaramirez_12141141;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 
-public class Cientifico {
+public class Cientifico implements Serializable {
     private String nom;
     private ArrayList <Planeta> planetas = new ArrayList();
 

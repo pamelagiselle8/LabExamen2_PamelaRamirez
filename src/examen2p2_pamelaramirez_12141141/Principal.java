@@ -1,6 +1,8 @@
 package examen2p2_pamelaramirez_12141141;
 
+import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Random;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -8,10 +10,13 @@ import javax.swing.JTextField;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
-public class Principal extends javax.swing.JFrame {
+public class Principal extends javax.swing.JFrame implements Runnable {
 
     Binarios file = new Binarios("./Cientificos.cbm");
-    private ArrayList<Planeta> publicos = new ArrayList();
+    ArrayList<Planeta> publicos = new ArrayList();
+    Planeta p1, p2;
+    int d, peso, tam, x, y;
+    Thread hilo = new Thread(this);
 
     public Principal() {
         initComponents();
@@ -25,9 +30,45 @@ public class Principal extends javax.swing.JFrame {
         publicos.add(new Gaseoso(300000, 30000, "Saturno", 560, 450));
         publicos.add(new Gaseoso(200000, 20000, "Urano", 670, 690));
         publicos.add(new Gaseoso(200000, 20000, "Neptuno", 840, 900));
+        publicos.add(new Gaseoso(400000, 40000, "Vegetta", 340, 310));
+        try {
+            file.cargarArchivo();
+            actualizarCbo();
+        } catch (Exception e) {
+        }
+    }
+
+    @Override
+    public void run() {
+        pb1.setMaximum((int) d);
+        boolean sigue = true;
+        while (sigue) {
+            try {
+                pb1.setValue(pb1.getValue() + 1);
+                Thread.sleep(5);
+                if (pb1.getValue() == pb1.getMaximum()) {
+                    sigue = false;
+                }
+            } catch (Exception ex) {
+                System.out.println(ex);
+            }
+        }
+        d = 0;
+        if (p1.seCrea()) {
+            String nom = JOptionPane.showInputDialog(this, "Se ha creado un nuevo planeta!"
+                    + "\nIngrese el nombre: ");
+            Cientifico cientifico = (Cientifico) cboCientificos.getSelectedItem();
+            if (p1 instanceof Terrestre) {
+                cientifico.getPlanetas().add(new Terrestre(tam, peso, nom, x, y));
+            } else {
+                cientifico.getPlanetas().add(new Gaseoso(tam, peso, nom, x, y));
+            }
+            actualizarTree(cientifico.getPlanetas());
+        }
     }
 
     public void actualizarCbo() {
+        file.cargarArchivo();
         DefaultComboBoxModel cbo = new DefaultComboBoxModel();
         if (!file.getCientificos().isEmpty()) {
             for (Cientifico cientifico : file.getCientificos()) {
@@ -39,6 +80,7 @@ public class Principal extends javax.swing.JFrame {
 
     public void actualizarTree(ArrayList<Planeta> planetas) {
         // Modelo, nodo y raiz
+        file.cargarArchivo();
         DefaultMutableTreeNode raiz = new DefaultMutableTreeNode("Planetas");
         DefaultTreeModel modelo = new DefaultTreeModel(raiz);
         DefaultMutableTreeNode nodoPlaneta = new DefaultMutableTreeNode();
@@ -51,17 +93,18 @@ public class Principal extends javax.swing.JFrame {
         tree.setModel(modelo);
         modelo.reload();
     }
-    
-    public void asignarPlaneta(JTextField txt) {
+
+    public Planeta asignarPlaneta(JTextField txt) {
+        Planeta planeta = null;
         if (tree.getSelectionCount() == 1) {
-            DefaultMutableTreeNode nodoPlaneta =
-                    (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-            Planeta planeta = (Planeta) nodoPlaneta.getUserObject();
+            DefaultMutableTreeNode nodoPlaneta
+                    = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+            planeta = (Planeta) nodoPlaneta.getUserObject();
             txt.setText(planeta.toString());
-        }
-        else {
+        } else {
             JOptionPane.showMessageDialog(this, "Debe seleccionar un planeta.", "", 2);
         }
+        return planeta;
     }
 
     @SuppressWarnings("unchecked")
@@ -124,6 +167,11 @@ public class Principal extends javax.swing.JFrame {
         jLabel1.setText("Cientificos");
 
         cboCientificos.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "- Seleccionar -" }));
+        cboCientificos.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cboCientificosItemStateChanged(evt);
+            }
+        });
 
         jLabel2.setText("Nombre");
 
@@ -135,6 +183,11 @@ public class Principal extends javax.swing.JFrame {
         });
 
         btnColision.setText("Colisionar");
+        btnColision.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnColisionActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -191,7 +244,7 @@ public class Principal extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(txtNom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnAdd)))
+                        .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
                 .addComponent(cbPublicos)
                 .addContainerGap(50, Short.MAX_VALUE))
@@ -206,26 +259,66 @@ public class Principal extends javax.swing.JFrame {
         } else {
             file.addCientifico(new Cientifico(txtNom.getText()));
             actualizarCbo();
+            txtNom.setText(null);
             JOptionPane.showMessageDialog(this, "Cientifico agregado exitosamente.", "Cientifico agregado", 1);
         }
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void cbPublicosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbPublicosActionPerformed
+        actualizarTree(new ArrayList());
         if (cbPublicos.isSelected()) {
             actualizarTree(publicos);
-        }
-        else {
-            actualizarTree(new ArrayList());
+        } else {
+            if (cboCientificos.getSelectedIndex() >= 0) {
+                Cientifico cientifico = (Cientifico) cboCientificos.getSelectedItem();
+                if (!cientifico.getPlanetas().isEmpty()) {
+                    actualizarTree(cientifico.getPlanetas());
+                }
+            }
         }
     }//GEN-LAST:event_cbPublicosActionPerformed
 
     private void pop1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pop1ActionPerformed
-        asignarPlaneta(txtPlaneta1);
+        p1 = asignarPlaneta(txtPlaneta1);
     }//GEN-LAST:event_pop1ActionPerformed
 
     private void pop2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pop2ActionPerformed
-        asignarPlaneta(txtPlaneta2);
+        p2 = asignarPlaneta(txtPlaneta2);
     }//GEN-LAST:event_pop2ActionPerformed
+
+    private void cboCientificosItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cboCientificosItemStateChanged
+        actualizarTree(new ArrayList());
+        if (cboCientificos.getSelectedIndex() >= 0) {
+            Cientifico cientifico = (Cientifico) cboCientificos.getSelectedItem();
+            if (!cientifico.getPlanetas().isEmpty()) {
+                actualizarTree(cientifico.getPlanetas());
+            }
+        }
+    }//GEN-LAST:event_cboCientificosItemStateChanged
+
+    private void btnColisionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnColisionActionPerformed
+        int x, y;
+        try {
+            if (cboCientificos.getSelectedIndex() >= 0) {
+                if (p1 != null && p2 != null) {
+                    x = (int) Math.pow(p2.getX() - p1.getX(), 2);
+                    y = (int) Math.pow(p2.getY() - p1.getY(), 2);
+                    d = (int) Math.sqrt(x + y);
+                    peso = (p1.getPeso() + p2.getPeso()) / 2;
+                    this.x = (p1.getX() + p2.getX()) / 2;
+                    this.y = (p1.getY() + p2.getY()) / 2;
+                }
+                if (d > 0) {
+                    pb1.setValue(0);
+                    new Thread(this).start();
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Debe seleccionar un cientifico.", "", 2);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_btnColisionActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */

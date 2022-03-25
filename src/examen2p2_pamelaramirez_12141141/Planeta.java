@@ -1,10 +1,11 @@
 
 package examen2p2_pamelaramirez_12141141;
 
+import java.io.Serializable;
 import java.util.Random;
 
 
-public abstract class Planeta {
+public abstract class Planeta implements Serializable {
     protected String nom;
     protected int tam, peso, x, y;
     protected Random r = new Random();
