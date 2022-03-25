@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
@@ -37,24 +38,40 @@ public class Principal extends javax.swing.JFrame {
     }
 
     public void actualizarTree(ArrayList<Planeta> planetas) {
-        // Modelo y raiz
+        // Modelo, nodo y raiz
         DefaultMutableTreeNode raiz = new DefaultMutableTreeNode("Planetas");
         DefaultTreeModel modelo = new DefaultTreeModel(raiz);
+        DefaultMutableTreeNode nodoPlaneta = new DefaultMutableTreeNode();
         if (!planetas.isEmpty()) {
-            // Nodo
-            DefaultMutableTreeNode nodoPlaneta = new DefaultMutableTreeNode();
             for (Planeta planeta : planetas) {
                 nodoPlaneta = new DefaultMutableTreeNode(planeta);
                 raiz.add(nodoPlaneta);
             }
         }
+        tree.setModel(modelo);
         modelo.reload();
+    }
+    
+    public void asignarPlaneta(JTextField txt) {
+        if (tree.getSelectionCount() == 1) {
+            DefaultMutableTreeNode nodoPlaneta =
+                    (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+            Planeta planeta = (Planeta) nodoPlaneta.getUserObject();
+            txt.setText(planeta.toString());
+        }
+        else {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar un planeta.", "", 2);
+        }
     }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        pop = new javax.swing.JPopupMenu();
+        pop1 = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        pop2 = new javax.swing.JMenuItem();
         pb2 = new javax.swing.JProgressBar();
         pb1 = new javax.swing.JProgressBar();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -69,10 +86,28 @@ public class Principal extends javax.swing.JFrame {
         btnAdd = new javax.swing.JButton();
         btnColision = new javax.swing.JButton();
 
+        pop1.setText("Asignar planeta 1");
+        pop1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pop1ActionPerformed(evt);
+            }
+        });
+        pop.add(pop1);
+        pop.add(jSeparator1);
+
+        pop2.setText("Asignar planeta 2");
+        pop2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pop2ActionPerformed(evt);
+            }
+        });
+        pop.add(pop2);
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Planetas");
         tree.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+        tree.setComponentPopupMenu(pop);
         jScrollPane1.setViewportView(tree);
 
         cbPublicos.setText("Planetas públicos");
@@ -81,6 +116,10 @@ public class Principal extends javax.swing.JFrame {
                 cbPublicosActionPerformed(evt);
             }
         });
+
+        txtPlaneta1.setEditable(false);
+
+        txtPlaneta2.setEditable(false);
 
         jLabel1.setText("Cientificos");
 
@@ -175,8 +214,18 @@ public class Principal extends javax.swing.JFrame {
         if (cbPublicos.isSelected()) {
             actualizarTree(publicos);
         }
-        
+        else {
+            actualizarTree(new ArrayList());
+        }
     }//GEN-LAST:event_cbPublicosActionPerformed
+
+    private void pop1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pop1ActionPerformed
+        asignarPlaneta(txtPlaneta1);
+    }//GEN-LAST:event_pop1ActionPerformed
+
+    private void pop2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pop2ActionPerformed
+        asignarPlaneta(txtPlaneta2);
+    }//GEN-LAST:event_pop2ActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -218,8 +267,12 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JProgressBar pb1;
     private javax.swing.JProgressBar pb2;
+    private javax.swing.JPopupMenu pop;
+    private javax.swing.JMenuItem pop1;
+    private javax.swing.JMenuItem pop2;
     private javax.swing.JTree tree;
     private javax.swing.JTextField txtNom;
     private javax.swing.JTextField txtPlaneta1;
