@@ -61,11 +61,15 @@ public class Principal extends javax.swing.JFrame implements Runnable {
             String nom = JOptionPane.showInputDialog(this, "Se ha creado un nuevo planeta!"
                     + "\nIngrese el nombre: ");
             Cientifico cientifico = (Cientifico) cboCientificos.getSelectedItem();
+            Planeta planeta;
             if (p1 instanceof Terrestre) {
-                cientifico.getPlanetas().add(new Terrestre(tam, peso, nom, x, y));
+                planeta = new Terrestre(tam, peso, nom, x, y);
+                cientifico.getPlanetas().add(planeta);
             } else {
-                cientifico.getPlanetas().add(new Gaseoso(tam, peso, nom, x, y));
+                planeta = new Gaseoso(tam, peso, nom, x, y);
+                cientifico.getPlanetas().add(planeta);
             }
+            file.getCientificos().get(cboCientificos.getSelectedIndex()).getPlanetas().add(planeta);
             file.escribirArchivo();
             file.cargarArchivo();
             actualizarTree(cientifico.getPlanetas());
@@ -188,6 +192,10 @@ public class Principal extends javax.swing.JFrame implements Runnable {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        pb2.setForeground(new java.awt.Color(153, 153, 255));
+
+        pb1.setForeground(new java.awt.Color(51, 0, 255));
+
         javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Planetas");
         tree.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
         tree.setComponentPopupMenu(pop);
@@ -294,7 +302,7 @@ public class Principal extends javax.swing.JFrame implements Runnable {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-        if (txtNom.getText().isEmpty() || txtNom.getText().isBlank()) {
+        if (txtNom.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Debe ingresar el nombre del cientifico.", "Entrada invalida", 2);
         } else {
             file.addCientifico(new Cientifico(txtNom.getText()));
@@ -371,7 +379,7 @@ public class Principal extends javax.swing.JFrame implements Runnable {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("metal".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }

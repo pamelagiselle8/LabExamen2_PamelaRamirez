@@ -40,6 +40,17 @@ public class Binarios {
         escribirArchivo();
     }
     
+    public void addPlaneta(Cientifico cientifico, Planeta planeta) {
+        if (!cientificos.isEmpty()) {
+            for (Cientifico cient : cientificos) {
+                if (cient.toString().equals(cientifico.toString())) {
+                    cient.getPlanetas().add(planeta);
+                }
+            }
+        }
+        escribirArchivo();
+    }
+    
     public void cargarArchivo() {
         try {            
             cientificos = new ArrayList();
